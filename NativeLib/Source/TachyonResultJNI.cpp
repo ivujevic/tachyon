@@ -34,7 +34,7 @@ JNIEXPORT jlongArray JNICALL JNI_METHOD(nativeGetEntries(JNIEnv* env, jclass, jl
         retArray.set(i, reinterpret_cast<jlong>(&proteineResult[i]));
     }
 
-    return retArray.operator _jlongArray *();
+    return retArray;
 }
 
 
@@ -56,7 +56,7 @@ JNIEXPORT jlongArray  JNICALL JNI_METHOD(nativeGetEntries(JNIEnv* env, jclass, j
         retArray.set(i, reinterpret_cast<jlong>(&nucleotideResults[i]));
     }
 
-    return retArray.operator _jlongArray *();
+    return retArray;
 }
 
 #undef JNI_PREFIX
@@ -82,5 +82,5 @@ JNIEXPORT jlongArray JNICALL JNI_METHOD(nativeGetEntries(JNIEnv* env, jclass, jl
         retArray.set(i, reinterpret_cast<jlong>(&result->entries_[i]));
     }
 
-    return retArray.operator _jlongArray *();
+    return retArray;
 }

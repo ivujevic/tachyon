@@ -28,7 +28,7 @@ JNIEXPORT jlongArray JNICALL JNI_METHOD(nativeGetAlignments(JNIEnv* env, jclass,
         retArray.set(i, reinterpret_cast<jlong>(&result->alignments_[i]));
     }
 
-    return retArray.operator _jlongArray *();
+    return retArray;
 }
 
 
@@ -102,7 +102,7 @@ JNIEXPORT jcharArray JNICALL JNI_METHOD(nativeGetAlignment(JNIEnv* env, jclass, 
         retArray.set(i, (jchar) alignment->alignment_[i]);
     }
 
-    return retArray.operator _jcharArray *();
+    return retArray;
 }
 
 JNIEXPORT jlong JNICALL JNI_METHOD(nativeGetTarget(JNIEnv* env, jclass, jlong nativePtr)) {
@@ -128,9 +128,10 @@ JNIEXPORT jstring JNICALL JNI_METHOD(nativeGetName(JNIEnv* env, jclass, jlong na
     jnipp::Env::Scope scope(env);
 
     auto elem(reinterpret_cast<utils::FastaFileElem*>(nativePtr));
-    if (!elem) printf("Greska\n");
+
     jnipp::String name(jnipp::String::create(elem->name_).steal());
-    return name.operator _jstring *();
+
+    return name;
 }
 
 JNIEXPORT jstring JNICALL JNI_METHOD(nativeGetSequence(JNIEnv* env, jclass, jlong nativePtr)) {
@@ -139,5 +140,5 @@ JNIEXPORT jstring JNICALL JNI_METHOD(nativeGetSequence(JNIEnv* env, jclass, jlon
     auto elem(reinterpret_cast<utils::FastaFileElem*>(nativePtr));
 
     jnipp::String seq(jnipp::String::create(elem->sequence_).steal());
-    return seq.operator _jstring *();
+    return seq;
 }

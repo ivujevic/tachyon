@@ -8,7 +8,6 @@ add_compile_options(
         "-DNDEBUG"
         "-Wall"
         "-Wextra"
-        "-Werror"
         "-Wno-error=deprecated-declarations"
         "$<$<CXX_COMPILER_ID:Clang>:-Wshorten-64-to-32>"
         "-fno-exceptions"

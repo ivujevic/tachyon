@@ -52,13 +52,3 @@ JNIEXPORT void JNICALL JNI_METHOD(nativeDelete(JNIEnv* env, jclass, jlong tachyo
 
     delete tachyon;
 }
-
-//JNIEXPORT jlong JNICALL JNI_METHOD(nucleotideSearch(JNIEnv* env, jclass, jlong tachyonPtr, jlong queryPtr)) {
-//
-//    jnipp::Env::Scope scope(env);
-//    auto tachyon(reinterpret_cast<tachyon::Tachyon*>(tachyonPtr));
-//
-//    auto query(jlong_as<tachyon::TachyonQuery>(queryPtr));
-//
-//    return reinterpret_cast<jlong>(new TachyonResultJNI{tachyon->search(std::move(query))});
-//}
