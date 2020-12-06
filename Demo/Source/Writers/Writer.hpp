@@ -14,9 +14,9 @@ struct Writer {
 
     }
 
-    void writeBM0(const TachyonResultEntry& results);
-    void writeBM8(const TachyonResultEntry& results);
-    void writeBM9(const TachyonResultEntry& results);
+    void writeBM0(const TachyonResultEntry& results, int maxAligns);
+    void writeBM8(const TachyonResultEntry& results, int maxAligns);
+    void writeBM9(const TachyonResultEntry& results, int maxAligns);
 
 private:
     std::unique_ptr<FILE, decltype(&fclose)> file_;

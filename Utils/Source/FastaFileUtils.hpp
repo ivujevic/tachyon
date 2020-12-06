@@ -53,7 +53,10 @@ private:
 struct FastaIterator {
 
     explicit FastaIterator(const char* p) : file_(fopen(p, "r"), &fclose) {
-
+        if (!file_) {
+            printf("Wrong fasta file\n");
+            std::terminate();
+        }
     }
 
     FastaIteratorIt begin() {

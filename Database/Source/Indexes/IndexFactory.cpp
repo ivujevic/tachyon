@@ -86,7 +86,6 @@ static void findInRegion(const std::string_view& region, const CounterStruct& co
 
 void findIndexes(IndexData& data, const CounterStruct& cs, const std::shared_ptr<utils::FastaFileElem>& elem, const IndexingOptions& options) {
 
-
     const std::string_view sequence = std::string_view(elem->sequence_);
     auto id = elem->id_;
 
@@ -131,89 +130,15 @@ void findIndexes(IndexData& data, const CounterStruct& cs, const std::shared_ptr
     }
 }
 
-//std::string convert(unsigned long hash) {
-//    std::string seq;
-//    for (int i = 0; i < 5; ++i) {
-//        char v = (char) (hash & 31);
-//        hash >>= 5;
-//        char c = v == 27 ? '*' : v + 'A';
-//        seq = c + seq;
-//    }
-//
-//    return seq;
-//}
-
-//static void writeCn(const CounterStruct& map) {
-//
-//    std::unique_ptr<FILE, decltype(&fclose)> file_(fopen("/home/ivujevic/NR/counters", "wt"), fclose);
-//
-//    std::vector<std::pair<unsigned int, unsigned int>> mv;
-//    for (int i = 0; i < (int) map.map_.size(); ++i) mv.emplace_back(i, map.map_[i]);
-//
-////    for (const auto& it : map.map_) mv.push_back(it);
-//    std::sort(mv.begin(), mv.end(), [](const auto& p1, const auto& p2) { return p1.first < p2.first; });
-//
-//    for (const auto& it : mv) {
-//        if (it.second == 0) continue;
-//        std::string s(convert(it.first));
-//        fwrite(s.data(), sizeof(char), s.length(), file_.get());
-//        s = " " + std::to_string(it.second) + "\n";
-//        fwrite(s.data(), sizeof(char), s.length(), file_.get());
-//    }
-//}
-
-//static void writeIndexes(const IndexData& in) {
-//
-//    auto fun = [&](const IndexStruct& s) {
-//        std::map<unsigned int, std::vector<std::pair<std::string, unsigned int>>> map;
-//        for (const auto&[hash, v] : s) {
-//            auto h = convert(hash);
-//            for (const auto& it : v) {
-//                map[it.id].emplace_back(h, it.position);
-//            }
-//        }
-//        using P1 = std::vector<std::pair<std::string, unsigned int>>;
-//        std::vector<std::pair<unsigned int, P1>> pairs;
-//        for (auto& it : map) pairs.emplace_back(std::move(it.first), std::move(it.second));
-//
-//        std::sort(pairs.begin(), pairs.end(), [&](const auto& a, const auto& b) { return a.first < b.first; });
-//
-//        return pairs;
-//    };
-//
-//    auto h = fun(in.highMap);
-//    auto l = fun(in.lowMap);
-//    (void) h;
-//    (void) l;
-//
-//    auto w = [&](auto& v, const auto name) {
-//        std::unique_ptr<FILE, decltype(&fclose)> fh(fopen(name, "wt"), fclose);
-//        for (auto& [id, v] : v) {
-//            fprintf(fh.get(), "%u\t", id);
-//            std::sort(v.begin(), v.end(), [](auto& p1, auto& p2) { return p1.second < p2.second; });
-//
-//            for (const auto& it : v) {
-//                fprintf(fh.get(), "{%s, %u} ", it.first.c_str(), it.second);
-//            }
-//            fprintf(fh.get(), "\n");
-//        }
-//    };
-//
-//    w(h, "/home/ivujevic/NR/index_high");
-//    w(l, "/home/ivujevic/NR/index_low");
-//}
-
 static std::optional<Indexes> buildIteratorIndexes(const char* path, const IndexingOptions& options) {
 
     using QueueType = std::shared_ptr<utils::FastaFileElem>;
 
     utils::Timer timer;
-//    auto globalCounter(IndexCounting::buildFromFile("/home/ivujevic/NR/counters"));
 
     auto globalCounter(IndexCounting::countIteratorIndexes(path, options));
 
     printf("\nFinished with counting %f\n", timer.end());
-//    writeCn(globalCounter);
 
     timer.start();
 
@@ -224,14 +149,13 @@ static std::optional<Indexes> buildIteratorIndexes(const char* path, const Index
         }
     };
 
-    IndexData data(utils::ProducerConsumersPool<QueueType>::run<IndexData>(options.numberOfThreads, utils::FastaIterator(path),
+    auto data(utils::ProducerConsumersPool<QueueType>::run<IndexData>(options.numberOfThreads, utils::FastaIterator(path),
             [&] (auto& data, const auto& t) { return findIndexes(data, globalCounter, t, options);},
             indexStructAccumulate));
 
 
     printf("\nFinished with indexes %f\n", timer.end());
 
-//    writeIndexes(data);
     return {Indexes(std::move(data.map_))};
 }
 

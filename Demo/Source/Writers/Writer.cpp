@@ -80,21 +80,21 @@ void printTabFormat(FILE* output_file_, const ProteineQuery& query, const std::v
         fprintf(output_file_, "\n");
     }
 }
-void Writer::writeBM8(const TachyonResultEntry& result) {
+void Writer::writeBM8(const TachyonResultEntry& result, int) {
 
 //    if (results.size() != 0) return;
 
         printTabFormat(file_.get(), result.query_, result.alignments_);
 }
 
-void Writer::writeBM9(const TachyonResultEntry& results) {
+void Writer::writeBM9(const TachyonResultEntry& results, int maxAligns) {
 
     fprintf(file_.get(), "# Fields:\n");
     fprintf(file_.get(),
             "Query id,Subject id,%% identity,alignment length,mismatches,"
             "gap openings,q. start,q. end,s. start,s. end,e-value,score\n");
 
-    writeBM8(results);
+    writeBM8(results, maxAligns);
 }
 
 }

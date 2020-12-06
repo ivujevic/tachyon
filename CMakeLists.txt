@@ -36,4 +36,7 @@ include(${CMAKE_CURRENT_LIST_DIR}/Aligner/Aligner.cmake)
 include(${CMAKE_CURRENT_LIST_DIR}/TachyonLib/TachyonLib.cmake)
 
 include(${CMAKE_CURRENT_LIST_DIR}/Demo/Demo.cmake)
-include(${CMAKE_CURRENT_LIST_DIR}/NativeLib/TachyonNativeLib.cmake)
+
+if (BUILD_NATIVE)
+    include(${CMAKE_CURRENT_LIST_DIR}/NativeLib/TachyonNativeLib.cmake)
+endif()
