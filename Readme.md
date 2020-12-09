@@ -1,5 +1,13 @@
 # Tachyon
 
+1. [Results](#results)
+    - [Sensitivity](#sensitivity)
+        - [BLASTP](#BLASTP)
+        - [BLASTX](#BLASTX)
+    - [Speed](#Speed)
+2. [Building](#Building)
+3. [Examples](#Examples)
+  
 ## Results
 We have compared Tachyon's performance to [DIAMOND](http://www.diamondsearch.org/index.php) 
 and [BLAST](https://blast.ncbi.nlm.nih.gov/Blast.cgi). As a reference we used NCBI NR (123GB),
@@ -7,10 +15,10 @@ and have used three query sets (HumDiv, HumVar, Escherichia).
 
 ### Sensitivity
 
-#### BLASTP mode
+#### BLASTP
 To measure sensitivity we used SW# as reference. The following tables shows sensitivity:
 
-HumDiv: 
+**HumDiv**: 
 
 | RANK | Tachyon      | Tachyon sensitive | Diamond      | Diamond sensitive | Diamond more sensitive | BLAST        |
 | ---- | ------------ | ----------------- | ------------ | ----------------- | ---------------------- | ------------ |
@@ -27,7 +35,7 @@ HumDiv:
 | 400  | 0.8163174603 | 0.9055238095      | 0.9536825397 | 0.9624920635      | 0.962515873            | 0.9471587302 |
 | 500  | 0.7514539683 | 0.8656952381      | 0.9515238095 | 0.9606095238      | 0.9606349206           | 0.9412634921 |
 
-HumVar:
+**HumVar**:
 
 | RANK | Tachyon      | Tachyon sensitive | Diamond      | Diamond sensitive | Diamond more sensitive | BLAST        |
 | ---- | ------------ | ----------------- | ------------ | ----------------- | ---------------------- | ------------ |
@@ -44,7 +52,7 @@ HumVar:
 | 400  | 0.6866559729 | 0.8044401371      | 0.938887671  | 0.9517594248      | 0.9450937047           | 0.9352449433 |
 | 500  | 0.6180714631 | 0.7509081591      | 0.9276575041 | 0.9447399833      |                        | 0.9258430541 |
 
-Escherichia:
+**Escherichia**:
 
 | RANK | Tachyon      | Tachyon sensitive | Diamond      | Diamond sensitive | Diamond more sensitive | BLAST        |
 | ---- | ------------ | ----------------- | ------------ | ----------------- | ---------------------- | ------------ |
@@ -61,17 +69,30 @@ Escherichia:
 | 400  | 0.9064412612 | 0.9099363988      | 0.9049565433 | 0.9220504984      | 0.9220563387           | 0.9626964314 |
 | 500  | 0.8902861568 | 0.8938464355      | 0.9083629204 | 0.926930224       | 0.9269398926           | 0.9678985774 |
 
+#### BLASTX
+
+To measure sensitivity of BLASTX mode we used 5K reads of Human genome and align it against NR database. For each
+read we measure how many times this read is mapped to Human reference in first N (1, 5, 10) results.
+From the results we can see that Tachyon in sensitive mode are better than Diamond for N < 5.
+
+|N | Tachyon | Tachyon Sensitive | Diamond | BLAST |
+|---| ------- | ---------------   | ------- | ----- |
+|1  | 615     |           769     |  731    | 937   |
+|5  | 1915    |           3076    |  3083   | 3719   |
+|10 | 2945    |           5156    |  5740   | 6649   |
+
+
 ### Speed
 
 #### BLASTP mode
 To measure speed we have used same query sets as for sensitivity. Those tables show that tachyon is 
 faster than Diamond, and Tachyon in sensitivity mode is also faster than Diamond in sensitivity mode.
 
-|        | Tachyon      | Tachyon sensitive | Diamond      | Diamond sensitive | Diamond more sensitive |
-| ----   | ------------ | ----------------- | ------------ | ----------------- | ---------------------- |
-| HumDiv | 197s         | 755.347s          | 629.359s     | 2596.23s          | 2578.82s               |
-| HumVar | 738.115s     | 1708.885s         | 830.195s     | 3530.22s          | 3588.32s               |
-| Esherichia | 435.262s     | 1179.694s         | 834.69s     | 3651.16s          | 3617.92s               |
+|               | Tachyon      | Tachyon sensitive | Diamond      | Diamond sensitive | Diamond more sensitive |
+| ----          | ------------ | ----------------- | ------------ | ----------------- | ---------------------- |
+| HumDiv        | 197s         | 755.347s          | 629.359s     | 2596.23s          | 2578.82s               |
+| HumVar        | 738.115s     | 1708.885s         | 830.195s     | 3530.22s          | 3588.32s               |
+| Esherichia    | 435.262s     | 1179.694s         | 834.69s      | 3651.16s          | 3617.92s               |
 
 ## Building
 
@@ -80,7 +101,7 @@ To build run the following commands from the cloned project:
 ```bash
     mkdir -p build
     cd build
-    cmake -DCMAKE_BUILD_TYPE=Release ..
+    cmake -DCMAKE_BUILD_TYPE=Release ..ma
     make
 ```
 
@@ -120,11 +141,13 @@ After that make indexes:
 
 `./Tachyon makedb --in ${PATH_TO_FOLDER_OF_NR_DB}/nr --db ${PATH_TO_FOLDER_OF_NR_DB}/nr.indexes`
 
-
 and search using the same query file as it was for Astral database:
-`./Tachyon blastp --db ${PATH_TO_FOLDER_OF_NR_DB}/nr.indexes ../db/queries.fa --out nr_output` 
+`./Tachyon blastp --db ${PATH_TO_FOLDER_OF_NR_DB}/nr.indexes --query ../db/queries.fa --out nr_output` 
 
+### BLASTX mode
+Tachyon also suports mapping RNA reads against protein database.
 
+`./Tachyon blastx --db ${PATH_TO_FOLDER_OF_NR_DB}/nr.indexes --query ../db/human_genome.fa --out blastx_output`
 ## Acknowledgments
 
 This work has been developed under supervision of prof. Mile Šikić (collab with Sebastian Maurer-Stroh from  Bioinformatics Institute, A*STAR). 
