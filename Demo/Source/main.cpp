@@ -143,7 +143,7 @@ struct SearchPCommand : public SearchCommand {
 
 struct SearchNCommand : public SearchCommand {
 
-    explicit SearchNCommand(lyra::cli& cli) : SearchCommand("blastn", cli) {
+    explicit SearchNCommand(lyra::cli& cli) : SearchCommand("blastx", cli) {
 
     }
 
