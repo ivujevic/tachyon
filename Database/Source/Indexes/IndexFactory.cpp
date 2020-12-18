@@ -95,18 +95,20 @@ void findIndexes(IndexData& data, const CounterStruct& cs, const std::shared_ptr
 
     }
 
-
-
     auto find = [&](bool isHigh) {
+
         std::vector<std::vector<KmerProperty>> indexes;
-        indexes.reserve(sequence.size() / options.highFreq.regionSize + 1);
-        int stepSize = options.highFreq.regionSize - options.highFreq.overlapSize;
+
+        const auto indexOptions = isHigh ? options.highFreq : options.lowFreq;
+
+        indexes.reserve(sequence.size() / indexOptions.regionSize + 1);
+        int stepSize = indexOptions.regionSize - indexOptions.overlapSize;
 
         for (int i = 0; i < (int) sequence.size(); i += stepSize) {
-            std::string_view region(sequence.substr(i, options.highFreq.regionSize));
-            if (i != 0 && (int) region.size() < 0.5 * options.highFreq.overlapSize) break;
+            std::string_view region(sequence.substr(i, indexOptions.regionSize));
+            if (i != 0 && (int) region.size() < 0.5 * indexOptions.overlapSize) break;
             indexes.emplace_back();
-            findInRegion(region, cs, options.kmerLen, i, options.highFreq.number, isHigh, indexes.back());
+            findInRegion(region, cs, options.kmerLen, i, indexOptions.number, isHigh, indexes.back());
         }
 
         return indexes;
