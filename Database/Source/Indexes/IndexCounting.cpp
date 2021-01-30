@@ -15,7 +15,8 @@ void sequenceCount(CounterStruct& counters, const std::shared_ptr<utils::FastaFi
 
     Seg seg(segParam.window, segParam.segLowCutOff, segParam.segHighCutOff);
 
-    counters.cn++;
+    ++counters.cn;
+
     if (seq->id_ % 10000 == 0) {
         printf("\rCounting status: %u", seq->id_);
         fflush(stdout);
@@ -45,6 +46,7 @@ CounterStruct IndexCounting::countIteratorIndexes(const char *path, const Indexi
         acc.cn += s.cn;
         s.addTo(acc);
     };
+
 
     return utils::ProducerConsumersPool<QueueType>::run<CounterStruct>(options.numberOfThreads, utils::FastaIterator(path),
                                                                                    [&] (auto& data, const auto& t){

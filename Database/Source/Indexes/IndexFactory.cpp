@@ -53,7 +53,7 @@ static void findInRegion(const std::string_view& region, const CounterStruct& co
     struct KmerInRegion {
 
         KmerProperty property_;
-        float tfIdf;
+        double tfIdf;
     };
 
     std::vector<KmerInRegion> sortedKmers;
@@ -63,8 +63,9 @@ static void findInRegion(const std::string_view& region, const CounterStruct& co
     for (const auto& it : kmers) {
 
         if (auto cn = counters.getValue(it.hash)) {
-            const float tf = localKmerCounter[it.hash] / numberOfWords;
-            const float idf = std::log(numberOfSequences / cn);
+
+            const double tf = ((float) localKmerCounter[it.hash]) / numberOfWords;
+            const double idf = std::log( ((float) numberOfSequences) / cn);
 
             sortedKmers.emplace_back(KmerInRegion{KmerProperty{it.hash, it.position_ + regionStart}, tf * idf});
         }

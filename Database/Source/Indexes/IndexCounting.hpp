@@ -13,6 +13,7 @@ struct CounterStruct : public NonCopyable {
 
     CounterStruct(CounterStruct&& o) {
         map_ = std::move(o.map_);
+        cn = o.cn;
     }
 
     unsigned int getValue(unsigned int key) const { return map_[key]; }
