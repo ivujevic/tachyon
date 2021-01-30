@@ -36,27 +36,42 @@ struct IndexData {
 
 
 static void findInRegion(const std::string_view& region, const CounterStruct& counters, int kmerLen, int regionStart, int numberInRegion,
-        bool isHighFreq, std::vector<KmerProperty>& indexes) {
+        bool isHighFreq, std::vector<KmerProperty>& indexes, int numberOfSequences) {
 
     std::vector<KmerProperty> kmers(KmerUtils::findCodes(region, kmerLen));
+
+    std::unordered_map<KmerHashType, int> localKmerCounter;
+
+    for (const auto& it : kmers) {
+        if (!localKmerCounter.count(it.hash)) {
+            localKmerCounter.insert({it.hash, 1});
+            continue;
+        }
+        localKmerCounter.insert({it.hash, localKmerCounter[it.hash] + 1});
+    }
 
     struct KmerInRegion {
 
         KmerProperty property_;
-        unsigned long counter_;
+        float tfIdf;
     };
 
     std::vector<KmerInRegion> sortedKmers;
 
+    const int numberOfWords = region.size() - (kmerLen - 1);
+
     for (const auto& it : kmers) {
 
         if (auto cn = counters.getValue(it.hash)) {
-            sortedKmers.emplace_back(KmerInRegion{KmerProperty{it.hash, it.position_ + regionStart}, cn});
+            const float tf = localKmerCounter[it.hash] / numberOfWords;
+            const float idf = std::log(numberOfSequences / cn);
+
+            sortedKmers.emplace_back(KmerInRegion{KmerProperty{it.hash, it.position_ + regionStart}, tf * idf});
         }
     }
 
     auto sortFunction = [isHighFreq](const KmerInRegion& a, const KmerInRegion& b) {
-        return isHighFreq ? a.counter_ > b.counter_ : a.counter_ < b.counter_;
+        return isHighFreq ? a.tfIdf > b.tfIdf : a.tfIdf < b.tfIdf;
     };
 
     std::stable_sort(sortedKmers.begin(), sortedKmers.end(), sortFunction);
@@ -95,38 +110,12 @@ void findIndexes(IndexData& data, const CounterStruct& cs, const std::shared_ptr
 
     }
 
+    std::vector<KmerProperty> indexes;
 
+    findInRegion(sequence, cs, options.kmerLen, 0, options.highFreq.number, true, indexes, cs.cn);
 
-    auto find = [&](bool isHigh) {
-        std::vector<std::vector<KmerProperty>> indexes;
-        indexes.reserve(sequence.size() / options.highFreq.regionSize + 1);
-        int stepSize = options.highFreq.regionSize - options.highFreq.overlapSize;
-
-        for (int i = 0; i < (int) sequence.size(); i += stepSize) {
-            std::string_view region(sequence.substr(i, options.highFreq.regionSize));
-            if (i != 0 && (int) region.size() < 0.5 * options.highFreq.overlapSize) break;
-            indexes.emplace_back();
-            findInRegion(region, cs, options.kmerLen, i, options.highFreq.number, isHigh, indexes.back());
-        }
-
-        return indexes;
-    };
-
-    int regionId = 0;
-    for (const auto& its : find(true)) {
-        for (const auto& it : its) {
-            data.map_[it.hash].emplace_back(IndexProperty{id, regionId, it.position_, true});
-        }
-        ++regionId;
-    }
-
-
-    regionId = 0;
-    for (const auto& its : find(false)) {
-        for (const auto& it : its) {
-            data.map_[it.hash].emplace_back(IndexProperty{id, regionId, it.position_, false});
-        }
-        ++regionId;
+    for (const auto& it : indexes) {
+        data.map_[it.hash].emplace_back(IndexProperty{id, 0, it.position_, true});
     }
 }
 
@@ -139,6 +128,7 @@ static std::optional<Indexes> buildIteratorIndexes(const char* path, const Index
     auto globalCounter(IndexCounting::countIteratorIndexes(path, options));
 
     printf("\nFinished with counting %f\n", timer.end());
+    printf("\nNumber of sequences %d\n", globalCounter.cn);
 
     timer.start();
 

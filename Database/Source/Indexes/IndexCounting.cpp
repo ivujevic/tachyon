@@ -24,12 +24,18 @@ void sequenceCount(CounterStruct& counters, const std::shared_ptr<utils::FastaFi
     std::string sequenceCopy(seq->sequence_);
     seg.mask(sequenceCopy);
 
+    std::unordered_set<long> localStatus;
+
     for (int i = 0; i < (int) sequenceCopy.size() - (kmerLen - 1); ++i) {
         unsigned long long hash = 0;
         if (!KmerUtils::hashFunction(sequenceCopy.substr(i, kmerLen), hash)) continue;
+        if (localStatus.find(hash) != localStatus.end()) continue;
+
+        localStatus.insert(hash);
         counters.increment(hash);
     }
 }
+
 }
 CounterStruct IndexCounting::countIteratorIndexes(const char *path, const IndexingOptions &options) {
 
