@@ -35,14 +35,6 @@ std::variant<std::vector<MatchP>, std::vector<MatchN>> createMatches(const std::
     std::vector<MatchP> dst;
     dst.reserve(ids.size());
 
-  /*  dst = utils::ThreadPool::run<MatchP>(8, ids, [&](const auto& targets) {
-        MatchP dst1;
-        dst1.reserve(targets.size());
-        for (const auto& id : targets) dst1.emplace_back(db.find(id)->second);
-
-        return dst1;
-    }); */
-
     for (const auto& targets : ids) {
         dst.emplace_back();
         dst.back().reserve(targets.size());
@@ -73,13 +65,6 @@ std::variant<std::vector<MatchP>, std::vector<MatchN>> readMatchesForEachQuery(c
 
     std::visit([&](const auto& it) { return addIds(it, neededIds);  }, hits);
 
-//    std::vector<long> idsVector;
-//    idsVector.reserve(neededIds.size());
-//    for (const auto& it :neededIds) idsVector.push_back(it);
-//    std::sort(idsVector.begin(), idsVector.end());
-
-//    printf("Added %ld\n", neededIds.size());
-
     std::vector<std::shared_ptr<utils::FastaFileElem>> elements(database.getSequences(neededIds));
 
     std::unordered_map<long, std::shared_ptr<utils::FastaFileElem>> localDatabase;
@@ -96,7 +81,15 @@ FirstStepResult::Result createEntries(std::vector<MatchP>&& matches, TachyonQuer
     auto& qs(std::get<std::vector<ProteineQuery>>(query.queries));
 
     for (int i = 0; i < (int) matches.size(); ++i) {
+
         entries.emplace_back(qs[i], std::move(matches[i]));
+
+//        std::vector<std::shared_ptr<utils::FastaFileElem>> ts = { qs[i] };
+//
+//        for (const auto& it: matches[i]) {
+//            if (it->sequence_.size() < 10000) continue;
+//            entries.emplace_back(it, ts);
+//        }
     }
 
     return entries;

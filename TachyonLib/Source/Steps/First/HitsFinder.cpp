@@ -41,22 +41,10 @@ static int findNumberOfSameDistances(const IT& fst, const IT& last) {
     return std::max(maxNumberOfEq, numberOfEq);
 }
 
-
 template<class IT>
 bool isValid(int cutOff, const IT& fst, const IT& end) {
 
-    if (std::distance(fst, end) < cutOff) return false;
-
-    auto k1 = fst;
-    auto k2 = std::next(fst);
-
-    while(k2 != end) {
-        if (k2->second.target < k1->second.target) return false;
-        k1 = k2;
-        ++k2;
-    }
-
-    return findNumberOfSameDistances(fst, end) > 1;
+    return std::distance(fst, end) < 7;
 }
 
 
@@ -123,7 +111,7 @@ HitsP getHits(const Database& database, const std::shared_ptr<utils::FastaFileEl
         }
     }
 
-    std::sort(highMatches.begin(), highMatches.end(), [](const auto& a, const auto& b) {
+    std::sort(lowMatches.begin(), lowMatches.end(), [](const auto& a, const auto& b) {
         if (a.first == b.first) {
             return a.second.region == b.second.region ? a.second.query < b.second.query : a.second.region < b.second.region;
         }

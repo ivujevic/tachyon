@@ -52,43 +52,6 @@ struct SearchCommand {
                                                  .name("--threads")
                                                  .help("Number of threads")
                                  )
-
-                                 .add_argument(
-                                         lyra::opt(firstStepOptions.highFreqCutOff, "highCutoff")
-                                                 .name("-hc")
-                                                 .name("--high-cutoff")
-                                                 .help("Cutoff of high frequence kmers, default = 3")
-                                 )
-                                 .add_argument(
-                                         lyra::opt(firstStepOptions.lowFreqCutOff, "lowCutoff")
-                                                 .name("-lc")
-                                                 .name("--low-cutoff")
-                                                 .help("Cutoff of low frequence kmers, default = 2")
-                                 )
-                                 .add_argument(
-                                         lyra::opt(secondStepOptions.ssearch_.maxEvalue, "maxEvalue")
-                                                 .name("-v")
-                                                 .name("--evalue")
-                                                 .help("Maximum evalue, default = 0.0001")
-                                 )
-                                 .add_argument(
-                                         lyra::opt(secondStepOptions.ssearch_.gapOpen, "gapOpen")
-                                                 .name("-g")
-                                                 .name("--gap-open")
-                                                 .help("gap open penalty, default = 10")
-                                 )
-                                 .add_argument(
-                                         lyra::opt(secondStepOptions.ssearch_.gapExtend, "gapExtend")
-                                                 .name("-e")
-                                                 .name("--gap-extend")
-                                                 .help("gap extend penalty, default = 1")
-                                 )
-                                 .add_argument(
-                                         lyra::opt(maxAligns, "maxAligns")
-                                                 .name("-a")
-                                                 .name("--max-aligns")
-                                                 .help("maximum number of outputs per query, default = 10")
-                                 )
         );
     }
 
@@ -111,7 +74,7 @@ protected:
         auto firstStepResult(FirstStep::getPotentialMatches(database, std::move(query), firstStepOptions));
         printf("First step finished [%fms]\n", timer.end());
         timer.start();
-        printf("Second step search...\n");
+        printf("Second step search [%d]...\n", secondStepOptions.numberOfThreads);
         auto secondStepResult(SecondStep::process(std::move(firstStepResult), secondStepOptions));
         printf("Second step finished [%fms]\n", timer.end());
         return secondStepResult;
@@ -135,46 +98,11 @@ struct SearchPCommand : public SearchCommand {
 
         Writer writer(outputPath.c_str());
         for (const auto& it : std::get<TachyonResult::ProteineResult>(result)) {
-            writer.writeBM9(it, maxAligns);
+            writer.write(it);
         }
     }
 };
 
-
-struct SearchNCommand : public SearchCommand {
-
-    explicit SearchNCommand(lyra::cli& cli) : SearchCommand("blastx", cli) {
-
-    }
-
-    void search() override {
-        std::vector<NucleotideQuery> queries;
-        for (const auto& it : utils::FastaIterator(queryPath.c_str())) {
-            queries.push_back(NucleotideQuery{it, utils::DNATranslator::translate(it)});
-            if (queries.size() > 10000) {
-                auto result(baseSearch({queries}));
-                Writer writer(outputPath.c_str());
-                for (const auto& it : std::get<std::vector<TachyonResult::NucleotideResult>>(result)) {
-                    for (const auto& it1 : it.entries_) {
-                        writer.writeBM9(it1, maxAligns);
-                    }
-                }
-
-                queries.clear();
-            }
-        }
-
-        if (queries.empty()) return;
-
-        auto result(baseSearch({queries}));
-        Writer writer(outputPath.c_str());
-        for (const auto& it : std::get<std::vector<TachyonResult::NucleotideResult>>(result)) {
-            for (const auto& it1 : it.entries_) {
-                writer.writeBM9(it1, maxAligns);
-            }
-        }
-    }
-};
 
 struct MakeDBCommand {
 
@@ -198,27 +126,6 @@ struct MakeDBCommand {
                                                        .name("-p")
                                                        .name("--threads")
                                                        .help("Number of   threads."))
-                                 .add_argument(lyra::opt(indexingOptions.highFreq.regionSize, "highRegionSize")
-                                                       .name("--hr")
-                                                       .name("--region-size-high"))
-                                 .add_argument(lyra::opt(indexingOptions.highFreq.number, "numberOfHighFreq")
-                                                       .name("--hk")
-                                                       .name("--num-high-kmers"))
-                                 .add_argument(lyra::opt(indexingOptions.lowFreq.regionSize, "lowRegionSize")
-                                                       .name("--lr")
-                                                       .name("--region-size-low"))
-                                 .add_argument(lyra::opt(indexingOptions.lowFreq.number, "numberOfLowFreq")
-                                                       .name("--lk")
-                                                       .name("--num-low-kmers"))
-                                 .add_argument(lyra::opt(indexingOptions.segParam.window, "segWindow")
-                                                       .name("--sw")
-                                                       .name("--seg-window-size"))
-                                 .add_argument(lyra::opt(indexingOptions.segParam.segHighCutOff, "segHighCutOff")
-                                                       .name("--shc")
-                                                       .name("--seg-high_cutoff"))
-                                 .add_argument(lyra::opt(indexingOptions.segParam.segLowCutOff, "segLowCutOff")
-                                                       .name("--slc")
-                                                       .name("--seg-low_cutoff"))
         );
     }
 
@@ -237,7 +144,6 @@ int main(int argc, char** argv) {
 
     MakeDBCommand makeDB{cli};
     SearchPCommand searchP{cli};
-    SearchNCommand searchN{cli};
 
     auto result = cli.parse({argc, argv});
 

@@ -14,7 +14,6 @@ add_compile_options(
         "-fno-rtti"
         "-fno-stack-protector"
         "-fPIC"
-        "-march=native"
         "-fvisibility=hidden"
         "-fvisibility-inlines-hidden"
 
@@ -32,7 +31,6 @@ link_libraries(
 
 include(${CMAKE_CURRENT_LIST_DIR}/Database/Database.cmake)
 include(${CMAKE_CURRENT_LIST_DIR}/Utils/Utils.cmake)
-include(${CMAKE_CURRENT_LIST_DIR}/Aligner/Aligner.cmake)
 include(${CMAKE_CURRENT_LIST_DIR}/TachyonLib/TachyonLib.cmake)
 
 include(${CMAKE_CURRENT_LIST_DIR}/Demo/Demo.cmake)

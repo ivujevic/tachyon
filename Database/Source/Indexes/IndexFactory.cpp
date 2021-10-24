@@ -92,37 +92,16 @@ void findIndexes(IndexData& data, const CounterStruct& cs, const std::shared_ptr
     if (id % 10000 == 0) {
         printf("\rIndexing status: %u", id);
         fflush(stdout);
-
     }
-
-
-
-    auto find = [&](bool isHigh) {
-        std::vector<std::vector<KmerProperty>> indexes;
-        indexes.reserve(sequence.size() / options.highFreq.regionSize + 1);
-        int stepSize = options.highFreq.regionSize - options.highFreq.overlapSize;
-
-        for (int i = 0; i < (int) sequence.size(); i += stepSize) {
-            std::string_view region(sequence.substr(i, options.highFreq.regionSize));
-            if (i != 0 && (int) region.size() < 0.5 * options.highFreq.overlapSize) break;
-            indexes.emplace_back();
-            findInRegion(region, cs, options.kmerLen, i, options.highFreq.number, isHigh, indexes.back());
-        }
-
-        return indexes;
-    };
 
     int regionId = 0;
-    for (const auto& its : find(true)) {
-        for (const auto& it : its) {
-            data.map_[it.hash].emplace_back(IndexProperty{id, regionId, it.position_, true});
-        }
-        ++regionId;
-    }
 
+    std::vector<std::vector<KmerProperty>> indexes;
+    indexes.push_back({});
+    findInRegion(sequence, cs, options.kmerLen, 0, options.highFreq.number, false, indexes.back());
 
     regionId = 0;
-    for (const auto& its : find(false)) {
+    for (const auto& its : indexes) {
         for (const auto& it : its) {
             data.map_[it.hash].emplace_back(IndexProperty{id, regionId, it.position_, false});
         }
