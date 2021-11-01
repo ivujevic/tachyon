@@ -15,9 +15,9 @@ struct SegParam {
 
 struct IndexingOptions {
 
-    int kmerLen = 5;
-    RegionParam highFreq = {3, 300, 5, 100};
-    RegionParam lowFreq = {2, 300, 7, 100};
+    int kmerLen = 12;
+    RegionParam highFreq = {3, 400, 5, 50};
+    RegionParam lowFreq = {2, 400, 7, 50};
     SegParam segParam;
 
     int numberOfThreads = 24;

@@ -14,7 +14,15 @@ std::string_view getQueryName(const NucleotideQuery query) {
     return std::string_view(query.query_->name_).substr(0, query.query_->name_.find_first_of(' '));
 }
 
+void Writer::writeFirstStep(const FirstStepResultEntry& entry) {
 
+    const auto queryName = getQueryName(entry.query_);
+
+    for (const auto& it : entry.targets_) {
+        std::string_view targetName = getQueryName(it);
+        fprintf(file_.get(), "%.*s\t%.*s\n", (int) queryName.size(), queryName.data(), (int) targetName.size(), targetName.data());
+    }
+}
 
 void printTabFormat(FILE* output_file_, const ProteineQuery& query, const std::vector<Alignment>& alignments) {
 

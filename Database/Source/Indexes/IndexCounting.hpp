@@ -15,23 +15,27 @@ struct CounterStruct : public NonCopyable {
         map_ = std::move(o.map_);
     }
 
-    unsigned int getValue(unsigned int key) const { return map_[key]; }
+    unsigned int getValue(unsigned long long key) const {
+        if (const auto p = this->map_.find(key); p != this->map_.end()) {
+            return p->second;
+        }
 
-    void addToKey(unsigned int key, unsigned int value) { map_[key] += value; }
-    void increment(unsigned int key) { addToKey(key, 1); }
+        return 0;
+    }
+
+    void addToKey(unsigned long long key, unsigned int value) { map_[key] += value; }
+    void increment(unsigned long long key) { addToKey(key, 1); }
 
     void addTo(CounterStruct& acc) const {
-        unsigned int i = 0;
         for (const auto& it : map_) {
-            if (it != 0) {
-                acc.addToKey(i, it);
+            if (it.second != 0) {
+                acc.addToKey(it.first, it.second);
             }
-            i++;
         }
     }
 
     int cn = 0;
-    std::vector<unsigned int> map_ = std::vector<unsigned int>(33554432, 0);
+    std::unordered_map<unsigned long long, unsigned int> map_;
 };
 
 

@@ -35,21 +35,38 @@ struct KmerUtils {
 
     static bool hashFunction(const std::string_view& kmer, unsigned long long& code) {
 
-        auto convertToNumb = [] (const char& c) {
-            if (c >= 'a' && c <= 'z') return c - 'a';
-            return c - 'A';
+        auto convertToNumb = [](const char& c) {
+            switch (c) {
+            case 'A':
+            case 'a':
+                return 0;
+            case 'C':
+            case 'c':
+                return 1;
+            case 'T':
+            case 't':
+                return 2;
+            case 'G':
+            case 'g':
+                return 3;
+            case 'U':
+            case 'u':
+                return 4;
+            default:
+                return 5;
+            }
         };
 
         for (const char& c : kmer) {
-            code <<= 5;
+            code <<= 3;
 
             if (!((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z'))) return false;
 
-            if (c == '*' || c == 'X' || c == 'B' || c == 'J' || c == 'O' || c == 'U') {
+            if (c == '*' || c == 'X' || c == 'B' || c == 'J' || c == 'O') {
                 return false;
             }
 
-            if (c == '*' || c == 'x' || c == 'b' || c == 'j' || c == 'o' || c == 'u') {
+            if (c == '*' || c == 'x' || c == 'b' || c == 'j' || c == 'o') {
                 return false;
             }
             code |= convertToNumb(c);

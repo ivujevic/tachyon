@@ -13,7 +13,6 @@ namespace {
 void sequenceCount(CounterStruct& counters, const std::shared_ptr<utils::FastaFileElem>& seq,
         const SegParam& segParam, int kmerLen) {
 
-    Seg seg(segParam.window, segParam.segLowCutOff, segParam.segHighCutOff);
 
     counters.cn++;
     if (seq->id_ % 10000 == 0) {
@@ -21,12 +20,10 @@ void sequenceCount(CounterStruct& counters, const std::shared_ptr<utils::FastaFi
         fflush(stdout);
 
     }
-    std::string sequenceCopy(seq->sequence_);
-    seg.mask(sequenceCopy);
 
-    for (int i = 0; i < (int) sequenceCopy.size() - (kmerLen - 1); ++i) {
+    for (int i = 0; i < (int) seq->sequence_.size() - (kmerLen - 1); ++i) {
         unsigned long long hash = 0;
-        if (!KmerUtils::hashFunction(sequenceCopy.substr(i, kmerLen), hash)) continue;
+        if (!KmerUtils::hashFunction(seq->sequence_.substr(i, kmerLen), hash)) continue;
         counters.increment(hash);
     }
 }

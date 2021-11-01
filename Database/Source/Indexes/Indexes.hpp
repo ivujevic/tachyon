@@ -15,7 +15,7 @@ struct IndexProperty {
     bool isHigh;
 };
 
-using IndexHashType = unsigned long;
+using IndexHashType = unsigned long long;
 using IndexStruct = std::unordered_map<IndexHashType, std::vector<IndexProperty>>;
 
 struct Indexes : public NonCopyable {
