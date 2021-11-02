@@ -20,7 +20,7 @@ void Writer::writeFirstStep(const FirstStepResultEntry& entry) {
 
     for (const auto& it : entry.targets_) {
         std::string_view targetName = getQueryName(it);
-        fprintf(file_.get(), "%.*s\t%.*s\n", (int) queryName.size(), queryName.data(), (int) targetName.size(), targetName.data());
+        fprintf(file_.get(), "%.*s\t%.*s\t%.*s\n", (int) queryName.size(), queryName.data(), (int) targetName.size(), targetName.data(), (int) it->sequence_.size(), it->sequence_.data());
     }
 }
 
