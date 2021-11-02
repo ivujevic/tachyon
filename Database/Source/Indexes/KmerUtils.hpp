@@ -20,7 +20,6 @@ struct KmerUtils {
         std::vector<KmerProperty> results;
 //        std::unordered_set<unsigned long> added;
 
-        results.reserve(sequence.size() - (kmerLen - 1));
 
         for (int i = 0; i < (int) sequence.size() - (kmerLen - 1); ++i) {
             unsigned long long code = 0;
