@@ -5,7 +5,7 @@
 
 namespace tachyon {
 
-TachyonResult Tachyon::search(TachyonQuery&& query, int numberOfThreads) {
+TachyonResult Tachyon::search(TachyonQuery&& query, int numberOfThreads) const {
 
     FirstStepOptions options;
     options.numberOfThreads = numberOfThreads;

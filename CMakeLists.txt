@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.5.1)
 
 project(Tachyon)
 
+set(CMAKE_CXX_STANDARD 17 CACHE STRING "C++ version selection")
 add_compile_options(
         "-O3"
         "-std=gnu++1z"
@@ -10,8 +11,6 @@ add_compile_options(
         "-Wextra"
         "-Wno-error=deprecated-declarations"
         "$<$<CXX_COMPILER_ID:Clang>:-Wshorten-64-to-32>"
-        "-fno-exceptions"
-        "-fno-rtti"
         "-fno-stack-protector"
         "-fPIC"
         "-march=native"
@@ -38,5 +37,5 @@ include(${CMAKE_CURRENT_LIST_DIR}/TachyonLib/TachyonLib.cmake)
 include(${CMAKE_CURRENT_LIST_DIR}/Demo/Demo.cmake)
 
 if (BUILD_NATIVE)
-    include(${CMAKE_CURRENT_LIST_DIR}/NativeLib/TachyonNativeLib.cmake)
+    include(${CMAKE_CURRENT_LIST_DIR}/PythonLib/PythonLib.cmake)
 endif()

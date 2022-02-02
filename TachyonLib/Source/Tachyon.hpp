@@ -13,8 +13,10 @@ struct TachyonSearchOptions {
 };
 
 struct Tachyon {
+
     const Database database_;
-    TachyonResult search(TachyonQuery&& query, int numberOfThreads);
+
+    TachyonResult search(TachyonQuery&& query, int numberOfThreads) const;
 };
 
 }
